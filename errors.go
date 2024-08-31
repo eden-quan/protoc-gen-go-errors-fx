@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/eden/protoc-gen-go-errors-fx/errors"
+	"github.com/eden-quan/protoc-gen-go-errors-fx/errors"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/eden/protoc-gen-go-errors-fx
+module github.com/eden-quan/protoc-gen-go-errors-fx
 
 go 1.19
 
