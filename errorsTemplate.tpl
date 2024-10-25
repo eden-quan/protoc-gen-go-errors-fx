@@ -67,6 +67,16 @@ func (e {{ .ErrorEnumName }}) FromError(err error) *errors.Error {
     return te.WithCause(te.Unwrap().(*errors.Error).WithCause(err))
 }
 
+// FromOrToError generate error from err with extra info, if err is nil, generate new error
+func (e {{ .ErrorEnumName }}) FromOrToError(err error) *errors.Error {
+	if err == nil {
+		return e.toError(4, "")
+	}
+
+	te := e.toError(4, "")
+    return te.WithCause(te.Unwrap().(*errors.Error).WithCause(err))
+}
+
 
 func (e {{ .ErrorEnumName }}) DefaultMessage() string {
     return {{ .ErrorEnumName }}MessageMap[int32(e.Number())]
