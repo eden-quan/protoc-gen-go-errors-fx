@@ -31,7 +31,7 @@ func (e {{ .ErrorEnumName }}) stackTrace(skipFrame int) string {
 }
 
 
-func (e {{ .ErrorEnumName }}) toError(skipFrame int, msgFormat string, args ...interface{}) *errors.Error {
+func (e {{ .ErrorEnumName }}) toError(skipFrame int, msgFormat string, args ...interface{}) error {
 	err := errors.New({{ .ErrorEnumName }}HttpCodeMap[int32(e.Number())], e.String(), fmt.Sprintf(msgFormat, args...))
 	innerErr := errors.New(int(err.Code), err.Reason, err.Message).WithMetadata(map[string]string{
 		"BizCode":        strconv.Itoa(int(e.Number())),
@@ -43,38 +43,38 @@ func (e {{ .ErrorEnumName }}) toError(skipFrame int, msgFormat string, args ...i
 }
 
 
-func (e {{ .ErrorEnumName }}) ToError(msgFormat string, args ...interface{}) *errors.Error {
+func (e {{ .ErrorEnumName }}) ToError(msgFormat string, args ...interface{}) error {
 	return e.toError(4, msgFormat, args...)
 }
 
 // FromErrorf generate error from err with extra info, if err is nil, mean's everything is fine, return nil
-func (e {{ .ErrorEnumName }}) FromErrorf(err error, format string, args ...interface{}) *errors.Error {
+func (e {{ .ErrorEnumName }}) FromErrorf(err error, format string, args ...interface{}) error {
 	if err == nil {
 		return nil
 	}
 
 	te := e.toError(4, format, args...)
-    return te.WithCause(te.Unwrap().(*errors.Error).WithCause(err))
+    return te.(*errors.Error).WithCause(te.(*errors.Error).Unwrap().(*errors.Error).WithCause(err))
 }
 
 // FromError generate error from err with extra info, if err is nil, mean's everything is fine, return nil
-func (e {{ .ErrorEnumName }}) FromError(err error) *errors.Error {
+func (e {{ .ErrorEnumName }}) FromError(err error) error {
 	if err == nil {
 		return nil
 	}
 
 	te := e.toError(4, "")
-    return te.WithCause(te.Unwrap().(*errors.Error).WithCause(err))
+    return te.(*errors.Error).WithCause(te.(*errors.Error).Unwrap().(*errors.Error).WithCause(err))
 }
 
 // FromOrToError generate error from err with extra info, if err is nil, generate new error
-func (e {{ .ErrorEnumName }}) FromOrToError(err error) *errors.Error {
+func (e {{ .ErrorEnumName }}) FromOrToError(err error) error {
 	if err == nil {
 		return e.toError(4, "")
 	}
 
 	te := e.toError(4, "")
-    return te.WithCause(te.Unwrap().(*errors.Error).WithCause(err))
+    return te.(*errors.Error).WithCause(te.(*errors.Error).Unwrap().(*errors.Error).WithCause(err))
 }
 
 
@@ -99,7 +99,7 @@ func Is{{.CamelValue}}(err error) bool {
 }
 
 {{ if .HasComment }}{{ .Comment }}{{ end -}}
-func Error{{ .CamelValue }}(format string, args ...interface{}) *errors.Error {
+func Error{{ .CamelValue }}(format string, args ...interface{}) error {
      return {{ .Name }}_{{ .Value }}.toError(4, format, args...)
 }
 
